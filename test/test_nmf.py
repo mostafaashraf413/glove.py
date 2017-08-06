@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 
 import evaluate
-import glove
+import nmf_we
 
 
 # Mock corpus (shamelessly stolen from Gensim word2vec tests)
@@ -23,12 +23,12 @@ I like trees and stuff
 Sometimes I build a graph
 Sometimes I build trees""").split("\n")
 
-glove.logger.setLevel(logging.ERROR)
-vocab = glove.build_vocab(test_corpus)
-cooccur = glove.build_cooccur(vocab, test_corpus, window_size=10)
+nmf_we.logger.setLevel(logging.ERROR)
+vocab = nmf_we.build_vocab(test_corpus)
+cooccur = nmf_we.build_cooccur(vocab, test_corpus, window_size=10)
 id2word = evaluate.make_id2word(vocab)
 
-W = glove.train_glove(vocab, cooccur, vector_size=10, iterations=500)
+W = nmf_we.train_glove(vocab, cooccur, vector_size=10, iterations=500)
 
 # Merge and normalize word vectors
 W = evaluate.merge_main_context(W)
