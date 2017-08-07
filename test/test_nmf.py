@@ -3,8 +3,7 @@ import logging
 from nose.tools import assert_equal, assert_true
 import numpy as np
 from numpy.testing import assert_allclose
-
-import evaluate
+import evaluate_nmf as evaluate
 import nmf_we
 
 
@@ -28,7 +27,7 @@ vocab = nmf_we.build_vocab(test_corpus)
 cooccur = nmf_we.build_cooccur(vocab, test_corpus, window_size=10)
 id2word = evaluate.make_id2word(vocab)
 
-W = nmf_we.train_glove(vocab, cooccur, vector_size=10, iterations=500)
+W = nmf_we.train_glove(vocab, cooccur, vector_size=10, iterations=100)
 
 # Merge and normalize word vectors
 W = evaluate.merge_main_context(W)

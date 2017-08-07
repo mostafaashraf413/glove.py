@@ -15,7 +15,7 @@ import msgpack
 import numpy as np
 from scipy import sparse
 
-from util import listify
+#from util import listify
 
 
 logger = logging.getLogger("glove")
@@ -117,7 +117,7 @@ def build_vocab(corpus):
     return {word: (i, freq) for i, (word, freq) in enumerate(vocab.iteritems())}
 
 
-@listify
+#@listify
 def build_cooccur(vocab, corpus, window_size=10, min_count=None):
     """
     Build a word co-occurrence list for the given corpus.
@@ -170,6 +170,9 @@ def build_cooccur(vocab, corpus, window_size=10, min_count=None):
 
     # Now yield our tuple sequence (dig into the LiL-matrix internals to
     # quickly iterate through all nonzero cells)
+    
+    cooccur_result = sparse.lil_matrix((vocab_size, vocab_size), dtype=np.float64)
+    
     for i, (row, data) in enumerate(itertools.izip(cooccurrences.rows,
                                                    cooccurrences.data)):
         if min_count is not None and vocab[id2word[i]][1] < min_count:
@@ -179,94 +182,41 @@ def build_cooccur(vocab, corpus, window_size=10, min_count=None):
             if min_count is not None and vocab[id2word[j]][1] < min_count:
                 continue
 
-            yield i, j, data[data_idx]
+            cooccur_result[i, j] = data[data_idx]
+            
+    return cooccur_result    
+    
 
-
-def run_iter(W, cooccurrences):
-    """
-    Run a single iteration of GloVe training using the given
-    cooccurrence data and the previously computed weight vectors /
-    biases and accompanying gradient histories.
-
-    `data` is a pre-fetched data / weights list where each element is of
-    the form
-
-        (v_main, v_context,
-         b_main, b_context,
-         gradsq_W_main, gradsq_W_context,
-         gradsq_b_main, gradsq_b_context,
-         cooccurrence)
-
-    as produced by the `train_glove` function. Each element in this
-    tuple is an `ndarray` view into the data structure which contains
-    it.
-
-    See the `train_glove` function for information on the shapes of `W`,
-    `biases`, `gradient_squared`, `gradient_squared_biases` and how they
-    should be initialized.
-
-    The parameters `x_max`, `alpha` define our weighting function when
-    computing the cost for two word pairs; see the GloVe paper for more
-    details.
-
-    Returns the cost associated with the given weight assignments and
-    updates the weights by online AdaGrad in place.
-    """
+def run_iter(W, cooccur, s_cooccur):
+    
     eps = 1e-20
     global_cost = 0
     
-    S = np.sign(cooccurrences)
-
-    W = W * ((S).dot(W.T))/((np.dot(S*W.T.dot(W),W.T))+eps)
+    #S = np.sign(cooccurrences)
     
-    #VH = np.dot(NG_V, H.T)
-    #WHH = np.dot(NG*W.dot(H), H.T)+eps
-    #W = W *(1-beta + (beta*(VH/WHH)))
-    #W = np.maximum(W, eps)
-
+    SW1 = ((cooccur).dot(W))
+    SW2 = ((np.dot(s_cooccur*W.dot(W.T),W))+eps)
+    
+    W[:] = W * SW1/SW2
+    W[:] = np.maximum(W, eps)
+    
     return global_cost
 
 
 def train_glove(vocab, cooccurrences, iter_callback=None, vector_size=100,
                 iterations=25, **kwargs):
-    """
-    Train GloVe vectors on the given generator `cooccurrences`, where
-    each element is of the form
-
-        (word_i_id, word_j_id, x_ij)
-
-    where `x_ij` is a cooccurrence value $X_{ij}$ as presented in the
-    matrix defined by `build_cooccur` and the Pennington et al. (2014)
-    paper itself.
-
-    If `iter_callback` is not `None`, the provided function will be
-    called after each iteration with the learned `W` matrix so far.
-
-    Keyword arguments are passed on to the iteration step function
-    `run_iter`.
-
-    Returns the computed word vector matrix `W`.
-    """
-
+    
     vocab_size = len(vocab)
 
-    # Word vector matrix. This matrix is (2V) * d, where N is the size
-    # of the corpus vocabulary and d is the dimensionality of the word
-    # vectors. All elements are initialized randomly in the range (-0.5,
-    # 0.5]. We build two word vectors for each word: one for the word as
-    # the main (center) word and one for the word as a context word.
-    #
-    # It is up to the client to decide what to do with the resulting two
-    # vectors. Pennington et al. (2014) suggest adding or averaging the
-    # two for each word, or discarding the context vectors.
-    W = (np.random.rand(vocab_size, vector_size) - 0.5) / float(vector_size + 1)
+    W = (np.random.rand(vocab_size, vector_size)) / float(vector_size + 1)
 
-    cooccurrences_ = np.array(cooccurrences.todense())
+    cooccur = np.array(cooccurrences.todense())
+    s_cooccur = np.sign(cooccur)
     
     for i in range(iterations):
         logger.info("\tBeginning iteration %i..", i)
 
-        cost = run_iter(W, cooccurrences_)
+        cost = run_iter(W, cooccur, s_cooccur)
 
         logger.info("\t\tDone (cost %f)", cost)
 
