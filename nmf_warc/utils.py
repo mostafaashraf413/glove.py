@@ -11,8 +11,8 @@ import gzip
 import re
 
 def extract_arabic_warc(warc_path):
+    result_lst = []
     with gzip.open(warc_path, 'rb')as f:
-        result_lst = []
         not_arChars = ur'[^ـ^\u0600-\u06FF^\u0750-\u077F^\u08A0-\u08FF^\uFB50-\uFDFF^\uFE70-\uFEFF]'
         counter = 0
         for line in f:
