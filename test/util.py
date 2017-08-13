@@ -43,6 +43,9 @@ def extract_arabic_warc(warc_path):
             counter+=1
             if counter % 100000 == 0:
                 print 'reading...'
+                
+            if len(result_lst) == 1000:
+                break
             
     return result_lst
 

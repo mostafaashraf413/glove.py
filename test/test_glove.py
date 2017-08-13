@@ -10,7 +10,7 @@ import glove
 
 
 ## Mock corpus (shamelessly stolen from Gensim word2vec tests)
-#test_corpus = ("""human interface computer
+test_corpus = ("""human interface computer
 #survey user computer system response time
 #eps user interface system
 #system human system eps
@@ -31,7 +31,7 @@ glove.logger.setLevel(logging.ERROR)
 print 'building vocab'
 vocab = glove.build_vocab(test_corpus)
 print 'building cooccurence matrix'
-cooccur = glove.build_cooccur(vocab, test_corpus, window_size=10)
+cooccur = glove.build_cooccur(vocab, test_corpus, window_size=5)
 id2word = evaluate.make_id2word(vocab)
 print 'start training the model'
 W = glove.train_glove(vocab, cooccur, vector_size=10, iterations=500)
@@ -41,11 +41,11 @@ W = evaluate.merge_main_context(W)
 print 'training is finished'
 
 def test_similarity():
-    similar = evaluate.most_similar(W, vocab, id2word, u'مركب')
+    similar = evaluate.most_similar(W, vocab, id2word, 'graph')
     logging.debug(similar)
     
     print similar
 
-    assert(u'سفينة' in similar)
+    assert('trees' in similar)
     
 test_similarity()
