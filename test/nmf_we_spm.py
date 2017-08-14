@@ -184,18 +184,18 @@ def build_cooccur(vocab, corpus, window_size=10, min_count=None):
 
             cooccur_result[i, j] = data[data_idx]
             
-    return cooccur_result    
+    return cooccur_result   
     
 
 def run_iter(W, cooccur, s_cooccur):
     
     eps = 1e-20
     global_cost = 0
+   
+    SW1 = cooccur.dot(W)
+    SW2 = np.add(s_cooccur.multiply(W.dot(W.T)).dot(W), eps)
     
-    SW1 = (cooccur).dot(W)
-    SW2 = (np.dot(s_cooccur*W.dot(W.T),W))+eps
-    
-    W[:] = W * SW1/SW2
+    W[:] = np.multiply(W , SW1/SW2)
     W[:] = np.maximum(W, eps)
     
     return global_cost
@@ -206,22 +206,24 @@ def train_glove(vocab, cooccurrences, iter_callback=None, vector_size=100,
     
     vocab_size = len(vocab)
 
-    W = (np.random.rand(vocab_size, vector_size)) / float(vector_size + 1)
+    W = np.mat((np.random.rand(vocab_size, vector_size)) / float(vector_size + 1))
 
-    cooccur = np.array(cooccurrences.todense())
-    s_cooccur = np.sign(cooccur)
+    #cooccur = np.array(cooccurrences.todense())
+    #s_cooccur = np.sign(cooccur)
+    s_cooccur = cooccurrences.copy()
+    s_cooccur[s_cooccur > 0] = 1
     
     for i in range(iterations):
         logger.info("\tBeginning iteration %i..", i)
 
-        cost = run_iter(W, cooccur, s_cooccur)
+        cost = run_iter(W, cooccurrences, s_cooccur)
 
         logger.info("\t\tDone (cost %f)", cost)
 
         if iter_callback is not None:
             iter_callback(W)
 
-    return W
+    return np.array(W)
 
 
 def save_model(W, path):

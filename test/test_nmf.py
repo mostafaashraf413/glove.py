@@ -27,7 +27,7 @@ vocab = nmf_we.build_vocab(test_corpus)
 cooccur = nmf_we.build_cooccur(vocab, test_corpus, window_size=10, min_count=1)
 id2word = evaluate.make_id2word(vocab)
 
-W = nmf_we.train_glove(vocab, cooccur, vector_size=10, iterations=200)
+W = nmf_we.train_glove(vocab, cooccur, vector_size=10, iterations=500)
 
 # Merge and normalize word vectors
 W = evaluate.merge_main_context(W)
