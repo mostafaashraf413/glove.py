@@ -185,16 +185,18 @@ def build_cooccur(vocab, corpus, window_size=10, min_count=None):
             cooccur_result[i, j] = data[data_idx]
             
     return cooccur_result   
-    
 
-def run_iter(W, cooccur, s_cooccur):
-    
+
+def run_iter(W, cooccur, s_cooccur):  
     eps = 1e-20
     global_cost = 0
    
     SW1 = cooccur.dot(W)
+    #SW2 = np.mat(np.zeros(SW1.shape))
+    #for i in xrange(SW2.shape[0]):
+    #    SW2[i] = np.add(s_cooccur[i].multiply(W[i].dot(W.T)).dot(W), eps)
     SW2 = np.add(s_cooccur.multiply(W.dot(W.T)).dot(W), eps)
-    
+
     W[:] = np.multiply(W , SW1/SW2)
     W[:] = np.maximum(W, eps)
     
@@ -203,13 +205,12 @@ def run_iter(W, cooccur, s_cooccur):
 
 def train_glove(vocab, cooccurrences, iter_callback=None, vector_size=100,
                 iterations=25, **kwargs):
+
     
     vocab_size = len(vocab)
 
     W = np.mat((np.random.rand(vocab_size, vector_size)) / float(vector_size + 1))
 
-    #cooccur = np.array(cooccurrences.todense())
-    #s_cooccur = np.sign(cooccur)
     s_cooccur = cooccurrences.copy()
     s_cooccur[s_cooccur > 0] = 1
     

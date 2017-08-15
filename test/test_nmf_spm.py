@@ -47,7 +47,7 @@ elapsed_time = time.time() - start_time
 print 'training is finished in %d'%(elapsed_time)
 
 def test_similarity():
-    similar = evaluate.most_similar(W, vocab, id2word, 'bank')
+    similar = evaluate.most_similar(W, vocab, id2word, 'graph')
     logging.debug(similar)
     
     print similar

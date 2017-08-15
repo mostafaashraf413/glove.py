@@ -45,7 +45,7 @@ print 'training is finished in %d'%(elapsed_time)
 #glove.save(embed_model_name)
 #######################################
 
-query = 'bank'
+query = 'graph'
 print('Loading pre-trained GloVe model')
 #glove = Glove.load(embed_model_name)
 
