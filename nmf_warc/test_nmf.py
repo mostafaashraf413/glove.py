@@ -5,7 +5,7 @@ from nose.tools import assert_equal, assert_true
 import numpy as np
 from numpy.testing import assert_allclose
 import evaluate_nmf as evaluate
-import nmf_we_spm as nmf_we
+import nmf_we as nmf_we
 
 
 #Mock corpus (shamelessly stolen from Gensim word2vec tests)
@@ -41,11 +41,11 @@ W = evaluate.merge_main_context(W)
 
 
 def test_similarity():
-    similar = evaluate.most_similar(W, vocab, id2word, 'graph')
+    similar = evaluate.most_similar(W, vocab, id2word, 'trees')
     logging.debug(similar)
     
     print similar
 
-    assert('trees' in similar)
+    assert('graph' in similar)
     
 test_similarity()

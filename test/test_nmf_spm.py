@@ -24,27 +24,30 @@ import time
 #Sometimes I build a graph
 #Sometimes I build trees""").split("\n")
 
-start_time = time.time()
+
 
 print 'reading corpus from zipped warc file'
-test_corpus = util.read_txt_file('../resources/test_corpus.txt')
+test_corpus = util.read_txt_file('../resources/test_corpus2.txt')
 
 nmf_we.logger.setLevel(logging.ERROR)
 print 'building vocab'
 vocab = nmf_we.build_vocab(test_corpus)
 print 'building cooccurence matrix'
-cooccur = nmf_we.build_cooccur(vocab, test_corpus, window_size=5)
+cooccur = nmf_we.build_cooccur(vocab, test_corpus, window_size=5, min_count=10)
 id2word = evaluate.make_id2word(vocab)
 print 'start training the model'
 
-W = nmf_we.train_glove(vocab, cooccur, vector_size=10, iterations=200)
+start_time = time.time()
+
+W = nmf_we.train_glove(vocab, cooccur, vector_size=50, iterations=10)
 # Merge and normalize word vectors
 W = evaluate.merge_main_context(W)
+
 elapsed_time = time.time() - start_time
 print 'training is finished in %d'%(elapsed_time)
 
 def test_similarity():
-    similar = evaluate.most_similar(W, vocab, id2word, 'genetic')
+    similar = evaluate.most_similar(W, vocab, id2word, 'bank')
     logging.debug(similar)
     
     print similar

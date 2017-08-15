@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 import util
 import evaluate
-import glove
+import glove_edu as glove
 import time
 
 
@@ -35,11 +35,13 @@ glove.logger.setLevel(logging.ERROR)
 print 'building vocab'
 vocab = glove.build_vocab(test_corpus)
 print 'building cooccurence matrix'
-cooccur = glove.build_cooccur(vocab, test_corpus, window_size=5)
+cooccur = glove.build_cooccur(vocab, test_corpus, window_size=5, min_count=10)
 id2word = evaluate.make_id2word(vocab)
 print 'start training the model'
 
-W = glove.train_glove(vocab, cooccur, vector_size=10, iterations=200)
+start_time = time.time()
+
+W = glove.train_glove(vocab, cooccur, vector_size=50, iterations=10)
 # Merge and normalize word vectors
 W = evaluate.merge_main_context(W)
 elapsed_time = time.time() - start_time
