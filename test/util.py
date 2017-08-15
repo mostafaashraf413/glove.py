@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
+import re
 
 
 def listify(fn):
@@ -55,7 +56,8 @@ def read_txt_file(file_path):
     with open(file_path, 'r')as f:
         for line in f:
             line = line.lower().strip()
-            if len(line) > 0:
+            line = re.sub('[^a-z -]+', '', line)
+            if len(line) > 1:
                 result_lst.append(line)
     return result_lst
     
