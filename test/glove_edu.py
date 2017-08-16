@@ -109,7 +109,8 @@ def build_vocab(corpus):
 
     vocab = Counter()
     for line in corpus:
-        tokens = line.strip().split()
+        #tokens = line.strip().split()
+        tokens = line
         vocab.update(tokens)
 
     logger.info("Done building vocab from corpus.")
@@ -148,7 +149,8 @@ def build_cooccur(vocab, corpus, window_size=10, min_count=None):
         if i % 1000 == 0:
             logger.info("Building cooccurrence matrix: on line %i", i)
 
-        tokens = line.strip().split()
+        #tokens = line.strip().split()
+        tokens = line
         token_ids = [vocab[word][0] for word in tokens]
 
         for center_i, center_id in enumerate(token_ids):

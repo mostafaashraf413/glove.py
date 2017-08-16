@@ -25,30 +25,29 @@ import time
 #Sometimes I build a graph
 #Sometimes I build trees""").split("\n")
 
-start_time = time.time()
 
 print 'reading corpus from zipped warc file'
 #test_corpus = util.extract_arabic_warc('../resources/0000.warc.gz')
-test_corpus = util.read_txt_file('../resources/test_corpus.txt')
+test_corpus = util.read_txt_file('../resources/test_corpus2.txt')
 
 glove.logger.setLevel(logging.ERROR)
 print 'building vocab'
 vocab = glove.build_vocab(test_corpus)
 print 'building cooccurence matrix'
-cooccur = glove.build_cooccur(vocab, test_corpus, window_size=5, min_count=10)
+cooccur = glove.build_cooccur(vocab, test_corpus, window_size=5, min_count=None)
 id2word = evaluate.make_id2word(vocab)
 print 'start training the model'
 
 start_time = time.time()
-
-W = glove.train_glove(vocab, cooccur, vector_size=50, iterations=10)
+W = glove.train_glove(vocab, cooccur, vector_size=50, iterations=20)
 # Merge and normalize word vectors
 W = evaluate.merge_main_context(W)
 elapsed_time = time.time() - start_time
+
 print 'training is finished in %d'%(elapsed_time)
 
 def test_similarity():
-    similar = evaluate.most_similar(W, vocab, id2word, 'genetic')
+    similar = evaluate.most_similar(W, vocab, id2word, 'money')
     logging.debug(similar)
     
     print similar
