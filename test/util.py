@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 import re
+from nltk.corpus import stopwords
+import codecs
 
 
 def listify(fn):
@@ -53,10 +55,12 @@ def extract_arabic_warc(warc_path):
 
 def read_txt_file(file_path):
     result_lst = []
-    with open(file_path, 'r')as f:
+    with codecs.open(file_path, 'r', encoding='utf-8')as f:
         for line in f:
             line = line.lower().strip()
             line = re.sub('[^a-z -]+', '', line)
+            line = line.split(' ')
+            line = [word for word in line if word not in stopwords.words('english')]
             if len(line) > 1:
                 result_lst.append(line)
     return result_lst
