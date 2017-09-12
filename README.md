@@ -10,7 +10,7 @@ The implementation is for educational purposes only; you should look elsewhere i
 # Our Modification:
 ## You can find our work in "nmf_warc" folder.
 ## We have just modified the functions "train_glove", and "run_iter" in "glove.py".
-## We replaced the original GloVe technique for matrix factorization with another one called "Mutiplicative Update Rule".
+## We replaced the original GloVe technique for matrix factorization with another one called "Mutiplicative Update Rule". This can be found in "nmf_warc/nmf_we_spm.py" script.
 ## For testing use "nmf_warc/test_nmf.py" script.
 
 ## For more information about "Mutiplicative Update Rule" read:
