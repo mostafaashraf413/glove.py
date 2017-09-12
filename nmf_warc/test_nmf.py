@@ -5,7 +5,7 @@ from nose.tools import assert_equal, assert_true
 import numpy as np
 from numpy.testing import assert_allclose
 import evaluate_nmf as evaluate
-import nmf_we as nmf_we
+import nmf_we_spm as nmf_we
 
 
 #Mock corpus (shamelessly stolen from Gensim word2vec tests)
